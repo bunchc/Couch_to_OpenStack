@@ -1,16 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require 'securerandom'
 
 nodes = {
     'controller'  => [1, 200],
 }
 
+# This is some magic to help avoid network collisions.
+# If however, it still collides, comment out this line and uncomment the one below it
+third_octet = SecureRandom.random_number(200)
+#third_octet = 172
+
 Vagrant.configure("2") do |config|
+    # We assume virtualbox, if using Fusion, you'll want to change this as needed
     config.vm.box = "precise64"
     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-
-    #Default is 2200..something, but port 2200 is used by forescout NAC agent.
-    config.vm.usable_port_range= 2800..2900 
     
     nodes.each do |prefix, (count, ip_start)|
         count.times do |i|
@@ -18,9 +22,11 @@ Vagrant.configure("2") do |config|
 
             config.vm.define "#{hostname}" do |box|
                 box.vm.hostname = "#{hostname}.book"
-                box.vm.network :private_network, ip: "172.16.0.#{ip_start+i}", :netmask => "255.255.0.0"
-                box.vm.network :private_network, ip: "10.10.0.#{ip_start+i}", :netmask => "255.255.0.0" 
-		box.vm.network :private_network, ip: "192.168.100.#{ip_start+i}", :netmask => "255.255.255.0" 
+                box.vm.network :private_network, ip: "172.16.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
+                box.vm.network :private_network, ip: "10.10.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
+
+                # Run the controller.sh file
+                box.vm.provision :shell, :path => "#{prefix}.sh"
 
                 # If using Fusion
                 box.vm.provider :vmware_fusion do |v|
@@ -29,9 +35,7 @@ Vagrant.configure("2") do |config|
 
                 # Otherwise using VirtualBox
                 box.vm.provider :virtualbox do |vbox|
-	            # Defaults
                     vbox.customize ["modifyvm", :id, "--memory", 1024]
-                    vbox.customize ["modifyvm", :id, "--cpus", 1]
                 end
             end
         end
