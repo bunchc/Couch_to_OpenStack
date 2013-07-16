@@ -2,7 +2,7 @@
 
 Contained in this repo are the scripts and supporting files for the Couch to OpenStack series of #vBrownBag podcasts.
 
-The podcast, slides, etc are available here: http://openstack.prov12n.com/Couch_to_openstack
+The podcast, slides, etc are available here: http://openstack.prov12n.com/about-couch-to-openstack/
 
 ## Usage
 
