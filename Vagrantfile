@@ -4,6 +4,7 @@ require 'securerandom'
 
 nodes = {
     'controller'  => [1, 200],
+    'compute'  => [1, 201],
 }
 
 # This is some magic to help avoid network collisions.
