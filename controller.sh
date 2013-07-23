@@ -334,6 +334,10 @@ ec2_private_dns_show_ip=True
 public_interface=eth1
 force_dhcp_release=True
 auto_assign_floating_ip=True
+#Metadata
+#metadata_host = ${CONTROLLER_HOST}
+#metadata_listen = ${CONTROLLER_HOST}
+#metadata_listen_port = 8775
 
 # Images
 image_service=nova.image.glance.GlanceImageService

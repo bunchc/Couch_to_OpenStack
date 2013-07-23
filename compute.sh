@@ -23,23 +23,16 @@ nova_configure() {
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 # To save you from rebooting, perform the following
 sysctl net.ipv4.ip_forward=1
-# Kill default bridge
-#virsh net-destroy default
-#virsh net-undefine default
 
 # restart libvirt
 sudo service libvirt-bin restart
 
-echo "
-Defaults !requiretty
-quantum ALL=(ALL:ALL) NOPASSWD:ALL" | tee -a /etc/sudoers
-
-#
 # Nova Conf
-	# Clobber the nova.conf file with the following
-	NOVA_CONF=/etc/nova/nova.conf
-	NOVA_API_PASTE=/etc/nova/api-paste.ini
-	cat > /tmp/nova.conf <<EOF
+# Clobber the nova.conf file with the following
+NOVA_CONF=/etc/nova/nova.conf
+NOVA_API_PASTE=/etc/nova/api-paste.ini
+
+cat > /tmp/nova.conf << EOF
 [DEFAULT]
 dhcpbridge_flagfile=/etc/nova/nova.conf
 dhcpbridge=/usr/bin/nova-dhcpbridge
@@ -73,6 +66,11 @@ public_interface=eth1
 force_dhcp_release=True
 auto_assign_floating_ip=True
 
+#Metadata
+#metadata_host = ${CONTROLLER_HOST}
+#metadata_listen = ${CONTROLLER_HOST}
+#metadata_listen_port = 8775
+
 # Images
 image_service=nova.image.glance.GlanceImageService
 glance_api_servers=${GLANCE_HOST}:9292
@@ -89,18 +87,17 @@ keystone_ec2_url=http://${KEYSTONE_ENDPOINT}:5000/v2.0/ec2tokens
 
 EOF
 
-	sudo rm -f $NOVA_CONF
-	sudo mv /tmp/nova.conf $NOVA_CONF
-	sudo chmod 0640 $NOVA_CONF
-	sudo chown nova:nova $NOVA_CONF
+  sudo rm -f $NOVA_CONF
+  sudo mv /tmp/nova.conf $NOVA_CONF
+  sudo chmod 0640 $NOVA_CONF
+  sudo chown nova:nova $NOVA_CONF
 
-	# Paste file
-        sudo sed -i "s/127.0.0.1/'$KEYSTONE_ENDPOINT'/g" $NOVA_API_PASTE
-        sudo sed -i "s/%SERVICE_TENANT_NAME%/'service'/g" $NOVA_API_PASTE
-        sudo sed -i "s/%SERVICE_USER%/nova/g" $NOVA_API_PASTE
-        sudo sed -i "s/%SERVICE_PASSWORD%/'$SERVICE_PASS'/g" $NOVA_API_PASTE
-
-	sudo nova-manage db sync
+# Paste file
+  sudo sed -i "s/127.0.0.1/'$KEYSTONE_ENDPOINT'/g" $NOVA_API_PASTE
+  sudo sed -i "s/%SERVICE_TENANT_NAME%/'service'/g" $NOVA_API_PASTE
+  sudo sed -i "s/%SERVICE_USER%/nova/g" $NOVA_API_PASTE
+  sudo sed -i "s/%SERVICE_PASSWORD%/'$SERVICE_PASS'/g" $NOVA_API_PASTE
+  sudo nova-manage db sync
 }
 
 nova_restart() {
