@@ -1,16 +1,20 @@
-source /vagrant/common.sh
+#. /vagrant/common.sh
+
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+
+# Grizzly Goodness
+sudo apt-get -y install ubuntu-cloud-keyring
+echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
+sudo apt-get update
+
+#sudo apt-get -y install
 
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 
-export CONTROLLER_HOST=${MY_IP}
-export GLANCE_HOST=${CONTROLLER_HOST}
-export MYSQL_HOST=${CONTROLLER_HOST}
-export KEYSTONE_ENDPOINT=${CONTROLLER_HOST}
-export SERVICE_TENANT_NAME=service
-export SERVICE_PASS=openstack
-export ENDPOINT=${KEYSTONE_ENDPOINT}
-export SERVICE_TOKEN=ADMIN
-export SERVICE_ENDPOINT=http://${ENDPOINT}:35357/v2.0
+# Must define your environment
+MYSQL_HOST=${CONTROLLER_HOST}
+GLANCE_HOST=${CONTROLLER_HOST}
 
 # MySQL
 export MYSQL_HOST=$MY_IP
@@ -390,3 +394,9 @@ export OS_USERNAME=admin
 export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://${MY_IP}:5000/v2.0/
 EOF
+
+#Pass Controller IP to Common.sh and other nodes
+cat > /vagrant/.controller <<EOF
+export CONTROLLER_HOST=${MY_IP}
+EOF
+
