@@ -132,7 +132,7 @@ keystone endpoint-create --region RegionOne --service_id $KEYSTONE_SERVICE_ID --
 # Glance Image Service
 GLANCE_SERVICE_ID=$(keystone service-list | awk '/\ glance\ / {print $2}')
 
-PUBLIC="http://$ENDPOINT:9292/v1"
+PUBLIC="http://$ENDPOINT:9292"
 ADMIN=$PUBLIC
 INTERNAL=$PUBLIC
 
