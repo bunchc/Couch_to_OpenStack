@@ -6,7 +6,7 @@ The podcast, slides, etc are available here: http://openstack.prov12n.com/about-
 
 ## Usage
 
-	git clone https://github.com/VMTrooper/Couch_to_OpenStack.git
+	git clone https://github.com/bunchc/Couch_to_OpenStack.git
 	cd Couch_to_OpenStack
 	vagrant up
 
