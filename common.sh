@@ -1,3 +1,5 @@
+source /vagrant/.controller
+
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
 

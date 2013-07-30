@@ -1,16 +1,20 @@
-source /vagrant/common.sh
+#. /vagrant/common.sh
+
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+
+# Grizzly Goodness
+sudo apt-get -y install ubuntu-cloud-keyring
+echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
+sudo apt-get update
+
+#sudo apt-get -y install
 
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 
-export CONTROLLER_HOST=${MY_IP}
-export GLANCE_HOST=${CONTROLLER_HOST}
-export MYSQL_HOST=${CONTROLLER_HOST}
-export KEYSTONE_ENDPOINT=${CONTROLLER_HOST}
-export SERVICE_TENANT_NAME=service
-export SERVICE_PASS=openstack
-export ENDPOINT=${KEYSTONE_ENDPOINT}
-export SERVICE_TOKEN=ADMIN
-export SERVICE_ENDPOINT=http://${ENDPOINT}:35357/v2.0
+# Must define your environment
+MYSQL_HOST=${CONTROLLER_HOST}
+GLANCE_HOST=${CONTROLLER_HOST}
 
 # MySQL
 export MYSQL_HOST=$MY_IP
@@ -104,6 +108,12 @@ USER_ID=$(keystone user-list | awk '/\ demo\ / {print $2}')
 # Assign the Member role to the demo user in cookbook
 keystone user-role-add --user $USER_ID --role $ROLE_ID --tenant_id $TENANT_ID
 
+# OpenStack Compute Nova API Endpoint
+keystone service-create --name nova --type compute --description 'OpenStack Compute Service'
+
+# OpenStack Compute EC2 API Endpoint
+keystone service-create --name ec2 --type ec2 --description 'EC2 Service'
+
 # Keystone Identity Service Endpoint
 keystone service-create --name keystone --type identity --description 'OpenStack Identity Service'
 
@@ -122,11 +132,29 @@ keystone endpoint-create --region RegionOne --service_id $KEYSTONE_SERVICE_ID --
 # Glance Image Service
 GLANCE_SERVICE_ID=$(keystone service-list | awk '/\ glance\ / {print $2}')
 
-PUBLIC="http://$ENDPOINT:9292/v1"
+PUBLIC="http://$ENDPOINT:9292"
 ADMIN=$PUBLIC
 INTERNAL=$PUBLIC
 
 keystone endpoint-create --region RegionOne --service_id $GLANCE_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
+
+# OpenStack Compute Nova API
+NOVA_SERVICE_ID=$(keystone service-list | awk '/\ nova\ / {print $2}')
+
+PUBLIC="http://$ENDPOINT:8774/v2/\$(tenant_id)s"
+ADMIN=$PUBLIC
+INTERNAL=$PUBLIC
+
+keystone endpoint-create --region RegionOne --service_id $NOVA_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
+
+# OpenStack Compute EC2 API
+EC2_SERVICE_ID=$(keystone service-list | awk '/\ ec2\ / {print $2}')
+
+PUBLIC="http://$ENDPOINT:8773/services/Cloud"
+ADMIN="http://$ENDPOINT:8773/services/Admin"
+INTERNAL=$PUBLIC
+
+keystone endpoint-create --region RegionOne --service_id $EC2_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
 
 # Service Tenant
 keystone tenant-create --name service --description "Service Tenant" --enabled true
@@ -136,16 +164,23 @@ keystone user-create --name keystone --pass keystone --tenant_id $SERVICE_TENANT
 
 keystone user-create --name glance --pass glance --tenant_id $SERVICE_TENANT_ID --email glance@localhost --enabled true
 
+keystone user-create --name nova --pass nova --tenant_id $SERVICE_TENANT_ID --email nova@localhost --enabled true
+
 # Get the admin role id
 ADMIN_ROLE_ID=$(keystone role-list | awk '/\ admin\ / {print $2}')
 KEYSTONE_USER_ID=$(keystone user-list | awk '/\ keystone\ / {print $2}')
 GLANCE_USER_ID=$(keystone user-list | awk '/\ glance\ / {print $2}')
+NOVA_USER_ID=$(keystone user-list | awk '/\ nova\ / {print $2}')
 
 # Assign the keystone user the admin role in service tenant
 keystone user-role-add --user $KEYSTONE_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
 
 # Assign the glance user the admin role in service tenant
 keystone user-role-add --user $GLANCE_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
+
+# Assign the nova user the admin role in service tenant
+keystone user-role-add --user $NOVA_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
+
 
 ###############################
 # Glance Install
@@ -247,6 +282,106 @@ fi
 glance image-create --name='Ubuntu 12.04 x86_64 Server' --disk-format=qcow2 --container-format=bare --public < precise-server-cloudimg-amd64-disk1.img
 glance image-create --name='Cirros 0.3' --disk-format=qcow2 --container-format=bare --public < cirros-0.3.0-x86_64-disk.img
 
+######################
+# Chapter 3 COMPUTE  #
+######################
+
+# Create database
+MYSQL_HOST=${MY_IP}
+GLANCE_HOST=${MY_IP}
+KEYSTONE_ENDPOINT=${MY_IP}
+SERVICE_TENANT=service
+SERVICE_PASS=nova
+
+MYSQL_ROOT_PASS=openstack
+MYSQL_NOVA_PASS=openstack
+mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE nova;'
+mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%'"
+mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'nova'@'%' = PASSWORD('$MYSQL_NOVA_PASS');"
+
+sudo apt-get -y install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
+
+# Clobber the nova.conf file with the following
+NOVA_CONF=/etc/nova/nova.conf
+NOVA_API_PASTE=/etc/nova/api-paste.ini
+
+cat > /tmp/nova.conf << EOF
+[DEFAULT]
+dhcpbridge_flagfile=/etc/nova/nova.conf
+dhcpbridge=/usr/bin/nova-dhcpbridge
+logdir=/var/log/nova
+state_path=/var/lib/nova
+lock_path=/var/lock/nova
+root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+verbose=True
+
+api_paste_config=/etc/nova/api-paste.ini
+enabled_apis=ec2,osapi_compute,metadata
+
+# Libvirt and Virtualization
+libvirt_use_virtio_for_bridges=True
+connection_type=libvirt
+libvirt_type=qemu
+
+# Database
+sql_connection=mysql://nova:openstack@${MYSQL_HOST}/nova
+
+# Messaging
+rabbit_host=${MYSQL_HOST}
+
+# EC2 API Flags
+ec2_host=${MYSQL_HOST}
+ec2_dmz_host=${MYSQL_HOST}
+ec2_private_dns_show_ip=True
+
+# Network settings
+public_interface=eth1
+force_dhcp_release=True
+auto_assign_floating_ip=True
+#Metadata
+#metadata_host = ${CONTROLLER_HOST}
+#metadata_listen = ${CONTROLLER_HOST}
+#metadata_listen_port = 8775
+
+# Images
+image_service=nova.image.glance.GlanceImageService
+glance_api_servers=${GLANCE_HOST}:9292
+
+# Scheduler
+scheduler_default_filters=AllHostsFilter
+
+# Object Storage
+iscsi_helper=tgtadm
+
+# Auth
+auth_strategy=keystone
+keystone_ec2_url=http://${KEYSTONE_ENDPOINT}:5000/v2.0/ec2tokens
+
+EOF
+
+sudo rm -f $NOVA_CONF
+sudo mv /tmp/nova.conf $NOVA_CONF
+sudo chmod 0640 $NOVA_CONF
+sudo chown nova:nova $NOVA_CONF
+
+# Paste file
+sudo sed -i "s/127.0.0.1/$KEYSTONE_ENDPOINT/g" $NOVA_API_PASTE
+sudo sed -i "s/%SERVICE_TENANT_NAME%/$SERVICE_TENANT/g" $NOVA_API_PASTE
+sudo sed -i "s/%SERVICE_USER%/nova/g" $NOVA_API_PASTE
+sudo sed -i "s/%SERVICE_PASSWORD%/$SERVICE_PASS/g" $NOVA_API_PASTE
+
+sudo nova-manage db sync
+
+sudo stop nova-api
+sudo stop nova-scheduler
+sudo stop nova-objectstore
+sudo stop nova-conductor
+
+sudo start nova-api
+sudo start nova-scheduler
+sudo start nova-objectstore
+sudo start nova-conductor
+
 
 ###############################
 # OpenStack Deployment Complete
@@ -259,3 +394,9 @@ export OS_USERNAME=admin
 export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://${MY_IP}:5000/v2.0/
 EOF
+
+#Pass Controller IP to Common.sh and other nodes
+cat > /vagrant/.controller <<EOF
+export CONTROLLER_HOST=${MY_IP}
+EOF
+
