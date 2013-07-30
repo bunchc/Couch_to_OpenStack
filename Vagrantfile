@@ -3,6 +3,7 @@
 require 'securerandom'
 
 nodes = {
+    'client' => [1, 110],
     'controller'  => [1, 200],
     'compute'  => [1, 201],
 }
@@ -40,6 +41,8 @@ Vagrant.configure("2") do |config|
                     v.vmx["numvcpus"] = 2
 	                elsif prefix == "controller"
     	              v.vmx["memsize"] = 2048
+                        elsif prefix == "client"
+                          v.vmx["memsize"] = 512
 	                end
                 end
 
@@ -53,6 +56,8 @@ Vagrant.configure("2") do |config|
                       vbox.customize ["modifyvm", :id, "--cpus", 2]
 		              elsif prefix == "controller"
 		                  vbox.customize ["modifyvm", :id, "--memory", 2048]
+				elsif prefix == "client"
+                                  vbox.customize ["modifyvm", :id, "--memory", 512]
 		              end
                 end
             end
