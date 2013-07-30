@@ -4,6 +4,7 @@ require 'securerandom'
 
 nodes = {
     'controller'  => [1, 200],
+    'compute'  => [1, 201],
 }
 
 # This is some magic to help avoid network collisions.
@@ -32,12 +33,27 @@ Vagrant.configure("2") do |config|
 
                 # If using Fusion
                 box.vm.provider :vmware_fusion do |v|
-                    v.vmx["memsize"] = 1024
+                # Default  
+                  v.vmx["memsize"] = 1024
+        	        if prefix == "compute"
+	              	  v.vmx["memsize"] = 3128
+                    v.vmx["numvcpus"] = 2
+	                elsif prefix == "controller"
+    	              v.vmx["memsize"] = 2048
+	                end
                 end
 
                 # Otherwise using VirtualBox
                 box.vm.provider :virtualbox do |vbox|
-                    vbox.customize ["modifyvm", :id, "--memory", 1024]
+	              # Defaults
+                  vbox.customize ["modifyvm", :id, "--memory", 1024]
+                  vbox.customize ["modifyvm", :id, "--cpus", 1]
+		              if prefix == "compute"
+                    	vbox.customize ["modifyvm", :id, "--memory", 3128]
+                      vbox.customize ["modifyvm", :id, "--cpus", 2]
+		              elsif prefix == "controller"
+		                  vbox.customize ["modifyvm", :id, "--memory", 2048]
+		              end
                 end
             end
         end
