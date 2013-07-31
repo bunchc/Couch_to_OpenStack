@@ -188,9 +188,9 @@ keystone user-role-add --user $NOVA_USER_ID --role $ADMIN_ROLE_ID --tenant_id $S
 
 # Install Service
 sudo apt-get update
-sudo apt-get -y install glance
-#sudo apt-get -y install glance-client # borks because of repo issues. I presume will be fixed.
-sudo apt-get -y install python-glanceclient 
+sudo apt-get -y --force-yes install glance
+#sudo apt-get -y --force-yes install glance-client # borks because of repo issues. I presume will be fixed.
+sudo apt-get -y --force-yes install python-glanceclient 
 
 ###############################
 # Glance Configure
@@ -299,7 +299,7 @@ mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE nova;'
 mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%'"
 mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'nova'@'%' = PASSWORD('$MYSQL_NOVA_PASS');"
 
-sudo apt-get -y install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
+sudo apt-get -y --force-yes install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
 
 # Clobber the nova.conf file with the following
 NOVA_CONF=/etc/nova/nova.conf
