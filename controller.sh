@@ -108,6 +108,9 @@ USER_ID=$(keystone user-list | awk '/\ demo\ / {print $2}')
 # Assign the Member role to the demo user in cookbook
 keystone user-role-add --user $USER_ID --role $ROLE_ID --tenant_id $TENANT_ID
 
+# Cinder Block Storage Endpoint
+keystone service-create --name volume --type volume --description 'Volume Service'
+
 # OpenStack Compute Nova API Endpoint
 keystone service-create --name nova --type compute --description 'OpenStack Compute Service'
 
@@ -156,6 +159,16 @@ INTERNAL=$PUBLIC
 
 keystone endpoint-create --region RegionOne --service_id $EC2_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
 
+# Cinder Block Storage Service
+CINDER_SERVICE_ID=$(keystone service-list | awk '/\ volume\ / {print $2}')
+CINDER_ENDPOINT="172.16.0.211" #Flag Modify so that it uses third octet.  Do string manipulation on ${CONTROLLER_HOST}
+PUBLIC="http://$CINDER_ENDPOINT:8776/v1/%(tenant_id)s" 
+ADMIN=$PUBLIC
+INTERNAL=$PUBLIC
+
+keystone endpoint-create --region RegionOne --service_id $CINDER_SERVICE_ID --publicurl $PUBLIC --adminurl $ADMIN --internalurl $INTERNAL
+
+
 # Service Tenant
 keystone tenant-create --name service --description "Service Tenant" --enabled true
 
@@ -166,11 +179,15 @@ keystone user-create --name glance --pass glance --tenant_id $SERVICE_TENANT_ID 
 
 keystone user-create --name nova --pass nova --tenant_id $SERVICE_TENANT_ID --email nova@localhost --enabled true
 
-# Get the admin role id
+keystone user-create --name cinder --pass cinder --tenant_id $SERVICE_TENANT_ID --email cinder@localhost --enabled true
+
+
+# Set user ids
 ADMIN_ROLE_ID=$(keystone role-list | awk '/\ admin\ / {print $2}')
 KEYSTONE_USER_ID=$(keystone user-list | awk '/\ keystone\ / {print $2}')
 GLANCE_USER_ID=$(keystone user-list | awk '/\ glance\ / {print $2}')
 NOVA_USER_ID=$(keystone user-list | awk '/\ nova\ / {print $2}')
+CINDER_USER_ID=$(keystone user-list | awk '/\ cinder \ / {print $2}')
 
 # Assign the keystone user the admin role in service tenant
 keystone user-role-add --user $KEYSTONE_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
@@ -181,6 +198,8 @@ keystone user-role-add --user $GLANCE_USER_ID --role $ADMIN_ROLE_ID --tenant_id 
 # Assign the nova user the admin role in service tenant
 keystone user-role-add --user $NOVA_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
 
+# Assign the cinder user the admin role in service tenant
+keystone user-role-add --user $CINDER_USER_ID --role $ADMIN_ROLE_ID --tenant_id $SERVICE_TENANT_ID
 
 ###############################
 # Glance Install
@@ -282,9 +301,9 @@ fi
 glance image-create --name='Ubuntu 12.04 x86_64 Server' --disk-format=qcow2 --container-format=bare --public < precise-server-cloudimg-amd64-disk1.img
 glance image-create --name='Cirros 0.3' --disk-format=qcow2 --container-format=bare --public < cirros-0.3.0-x86_64-disk.img
 
-######################
-# Chapter 3 COMPUTE  #
-######################
+###############################
+# Nova Install
+###############################
 
 # Create database
 MYSQL_HOST=${MY_IP}
@@ -343,6 +362,12 @@ auto_assign_floating_ip=True
 #metadata_listen = ${CONTROLLER_HOST}
 #metadata_listen_port = 8775
 
+# Cinder #
+volume_driver=nova.volume.driver.ISCSIDriver
+enabled_apis=ec2,osapi_compute,metadata
+volume_api_class=nova.volume.cinder.API
+iscsi_helper=tgtadm
+
 # Images
 image_service=nova.image.glance.GlanceImageService
 glance_api_servers=${GLANCE_HOST}:9292
@@ -382,6 +407,16 @@ sudo start nova-scheduler
 sudo start nova-objectstore
 sudo start nova-conductor
 
+###############################
+# Cinder DB Create
+###############################
+
+# Install the DB
+MYSQL_ROOT_PASS=openstack
+MYSQL_CINDER_PASS=openstack
+mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE cinder;'
+mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%';"
+mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'cinder'@'%' = PASSWORD('$MYSQL_CINDER_PASS');"
 
 ###############################
 # OpenStack Deployment Complete
