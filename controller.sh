@@ -48,6 +48,9 @@ mysql -u root --password=${MYSQL_ROOT_PASS} -h localhost -e "GRANT ALL ON *.* to
 
 mysqladmin -uroot -p${MYSQL_ROOT_PASS} flush-privileges
 
+# Define environment variable to contain the OpenStack Controller IP for later use
+export OSCONTROLLER=$MY_IP
+
 ###############################
 # Keystone Install
 ###############################
@@ -161,7 +164,7 @@ keystone endpoint-create --region RegionOne --service_id $EC2_SERVICE_ID --publi
 
 # Cinder Block Storage Service
 CINDER_SERVICE_ID=$(keystone service-list | awk '/\ volume\ / {print $2}')
-CINDER_ENDPOINT="172.16.0.211" #Flag Modify so that it uses third octet.  Do string manipulation on ${CONTROLLER_HOST}
+CINDER_ENDPOINT=$(echo $OSCONTROLLER | sed 's/\.[0-9]*$/.211/') #Change last octet of OpenStack Controller IP to the Cinder IP.  Concerned about hardcoding it...
 PUBLIC="http://$CINDER_ENDPOINT:8776/v1/%(tenant_id)s" 
 ADMIN=$PUBLIC
 INTERNAL=$PUBLIC
