@@ -16,9 +16,9 @@ third_octet = SecureRandom.random_number(200)
 Vagrant.configure("2") do |config|
     # We assume virtualbox, if using Fusion, you'll want to change this as needed
     config.vm.box = "precise64"
-    #config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
     #VMware Fusion Users: Comment the line above and uncomment the line below
-    config.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+    #config.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
     
     nodes.each do |prefix, (count, ip_start)|
         count.times do |i|

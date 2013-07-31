@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# iscsi.sh
+# cinder.sh
 
 # Authors: Cody Bunch (bunchc@gmail.com)
 
