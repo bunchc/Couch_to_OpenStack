@@ -71,6 +71,12 @@ auto_assign_floating_ip=True
 #metadata_listen = ${CONTROLLER_HOST}
 #metadata_listen_port = 8775
 
+# Cinder #
+volume_driver=nova.volume.driver.ISCSIDriver
+enabled_apis=ec2,osapi_compute,metadata
+volume_api_class=nova.volume.cinder.API
+iscsi_helper=tgtadm
+
 # Images
 image_service=nova.image.glance.GlanceImageService
 glance_api_servers=${GLANCE_HOST}:9292
