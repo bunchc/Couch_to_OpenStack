@@ -10,7 +10,7 @@ GLANCE_HOST=${CONTROLLER_HOST}
 nova_compute_install() {
 
 	# Install some packages:
-	sudo apt-get -y install nova-api-metadata nova-compute nova-compute-qemu nova-doc nova-network
+	sudo apt-get -y --force-yes install nova-api-metadata nova-compute nova-compute-qemu nova-doc nova-network
 	sudo apt-get install -y vlan bridge-utils
 	sudo apt-get install -y libvirt-bin pm-utils
 	sudo service ntp restart
