@@ -11,6 +11,8 @@ sudo apt-get update
 #sudo apt-get -y install
 
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
+MY_PRIV_IP=$(ifconfig eth2 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
+
 
 # Must define your environment
 MYSQL_HOST=${CONTROLLER_HOST}
@@ -210,9 +212,9 @@ keystone user-role-add --user $CINDER_USER_ID --role $ADMIN_ROLE_ID --tenant_id 
 
 # Install Service
 sudo apt-get update
-sudo apt-get -y --force-yes install glance
-#sudo apt-get -y --force-yes install glance-client # borks because of repo issues. I presume will be fixed.
-sudo apt-get -y --force-yes install python-glanceclient 
+sudo apt-get -y install glance
+#sudo apt-get -y install glance-client # borks because of repo issues. I presume will be fixed.
+sudo apt-get -y install python-glanceclient 
 
 ###############################
 # Glance Configure
@@ -321,7 +323,7 @@ mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE nova;'
 mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%'"
 mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'nova'@'%' = PASSWORD('$MYSQL_NOVA_PASS');"
 
-sudo apt-get -y --force-yes install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
+sudo apt-get -y install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
 
 # Clobber the nova.conf file with the following
 NOVA_CONF=/etc/nova/nova.conf
@@ -436,5 +438,6 @@ EOF
 #Pass Controller IP to Common.sh and other nodes
 cat > /vagrant/.controller <<EOF
 export CONTROLLER_HOST=${MY_IP}
+export CONTROLLER_PRIV_HOST=${MY_PRIV_IP}
 EOF
 
