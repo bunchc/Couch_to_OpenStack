@@ -8,10 +8,10 @@
 . /vagrant/common.sh
 
 # Install some deps
-sudo apt-get install -y --force-yes linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
+sudo apt-get install -y linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
 
 # Install Cinder Things
-sudo apt-get install -y --force-yes cinder-api cinder-scheduler cinder-volume open-iscsi python-cinderclient tgt
+sudo apt-get install -y cinder-api cinder-scheduler cinder-volume open-iscsi python-cinderclient tgt
 
 # Restart services
 sudo service open-iscsi start
@@ -23,6 +23,11 @@ sudo sed -i 's/%SERVICE_TENANT_NAME%/service/g' /etc/cinder/api-paste.ini
 sudo sed -i 's/%SERVICE_USER%/cinder/g' /etc/cinder/api-paste.ini
 sudo sed -i 's/%SERVICE_PASSWORD%/cinder/g' /etc/cinder/api-paste.ini
 
+# OpenStack Controller Private IP for use with generating Cinder target IP
+OSC_PRIV_IP=${CONTROLLER_HOST_PRIV}
+
+# Define environment variable to contain the OpenStack Controller Private IP for use with Cinder
+export OSCONTROLLER_P=$OSC_PRIV_IP
 
 # /etc/cinder/cinder.conf
 cat > /etc/cinder/cinder.conf <<EOF
@@ -37,6 +42,8 @@ volume_group = cinder-volumes
 verbose = True
 auth_strategy = keystone
 #osapi_volume_listen_port=5900
+
+iscsi_ip_address = $(echo $OSCONTROLLER_P | sed 's/\.[0-9]*$/.211/') #set private IP address for providing iSCSI storage to VMs
 
 # Add these when not using the defaults.
 rabbit_host = ${CONTROLLER_HOST}
