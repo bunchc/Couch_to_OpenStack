@@ -4,6 +4,8 @@ Contained in this repo are the scripts and supporting files for the Couch to Ope
 
 The podcast, slides, etc are available here: http://openstack.prov12n.com/about-couch-to-openstack/
 
+Check the Repo Wiki for instructions on how to use the environment.
+
 ## Usage
 
 	git clone https://github.com/bunchc/Couch_to_OpenStack.git
