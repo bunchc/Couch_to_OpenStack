@@ -43,7 +43,8 @@ verbose = True
 auth_strategy = keystone
 #osapi_volume_listen_port=5900
 
-iscsi_ip_address = $(echo $OSCONTROLLER_P | sed 's/\.[0-9]*$/.211/') #set private IP address for providing iSCSI storage to VMs
+#set private IP address for providing iSCSI storage to VMs
+iscsi_ip_address = $(echo $OSCONTROLLER_P | sed 's/\.[0-9]*$/.211/') 
 
 # Add these when not using the defaults.
 rabbit_host = ${CONTROLLER_HOST}
