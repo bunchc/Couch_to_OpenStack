@@ -5,7 +5,7 @@ sudo apt-get update
 
 # Grizzly Goodness
 sudo apt-get -y install ubuntu-cloud-keyring
-echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
+echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
 sudo apt-get update
 
 #sudo apt-get -y install
@@ -214,9 +214,9 @@ keystone user-role-add --user $CINDER_USER_ID --role $ADMIN_ROLE_ID --tenant_id 
 
 # Install Service
 sudo apt-get update
-sudo apt-get -y install glance
-#sudo apt-get -y install glance-client # borks because of repo issues. I presume will be fixed.
-sudo apt-get -y install python-glanceclient 
+sudo apt-get -y --force-yes install glance
+#sudo apt-get -y --force-yes install glance-client # borks because of repo issues. I presume will be fixed.
+sudo apt-get -y --force-yes install python-glanceclient 
 
 ###############################
 # Glance Configure
@@ -325,7 +325,7 @@ mysql -uroot -p$MYSQL_ROOT_PASS -e 'CREATE DATABASE nova;'
 mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%'"
 mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'nova'@'%' = PASSWORD('$MYSQL_NOVA_PASS');"
 
-sudo apt-get -y install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
+sudo apt-get -y --force-yes install rabbitmq-server nova-api nova-scheduler nova-objectstore dnsmasq nova-conductor
 
 # Clobber the nova.conf file with the following
 NOVA_CONF=/etc/nova/nova.conf

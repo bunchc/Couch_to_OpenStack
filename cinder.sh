@@ -8,10 +8,10 @@
 . /vagrant/common.sh
 
 # Install some deps
-sudo apt-get install -y linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
+sudo apt-get install -y --force-yes linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
 
 # Install Cinder Things
-sudo apt-get install -y cinder-api cinder-scheduler cinder-volume open-iscsi python-cinderclient tgt
+sudo apt-get install -y --force-yes cinder-api cinder-scheduler cinder-volume open-iscsi python-cinderclient tgt sysfsutils
 
 # Restart services
 sudo service open-iscsi start
