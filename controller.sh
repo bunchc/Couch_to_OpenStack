@@ -36,7 +36,7 @@ echo "mysql-server-5.5 mysql-server/root_password_again seen true" | sudo debcon
 # MySQL Install
 ###############################
 
-sudo apt-get -y install mysql-server python-mysqldb
+sudo apt-get -y install vim mysql-server python-mysqldb
 
 sudo sed -i "s/^bind\-address.*/bind-address = 0.0.0.0/g" /etc/mysql/my.cnf
 sudo sed -i "s/^#max_connections.*/max_connections = 512/g" /etc/mysql/my.cnf

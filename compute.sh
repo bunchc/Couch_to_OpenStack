@@ -14,7 +14,7 @@ nova_compute_install() {
 
 	# Install some packages:
 	sudo apt-get -y --force-yes install nova-api-metadata nova-compute nova-compute-qemu nova-doc nova-network
-	sudo apt-get install -y vlan bridge-utils
+	sudo apt-get install -y vim vlan bridge-utils
 	sudo apt-get install -y libvirt-bin pm-utils sysfsutils
 	sudo service ntp restart
 }
