@@ -7,14 +7,15 @@ nodes = {
     'compute'  => [1, 201],
     'cinder' => [1, 211],
     'quantum' => [1, 202],
+    'client' => [1, 100],
 }
 
 
 
 # This is some magic to help avoid network collisions.
 # If however, it still collides, or if you need to vagrant up machines one at a time, comment out this line and uncomment the one below it
-third_octet = SecureRandom.random_number(200)
-#third_octet = 172
+#third_octet = SecureRandom.random_number(200)
+third_octet = 80
 
 Vagrant.configure("2") do |config|
   # We assume virtualbox, if using Fusion, you'll want to change this as needed
@@ -81,4 +82,4 @@ Vagrant.configure("2") do |config|
       end
     end
   end
-end
+
