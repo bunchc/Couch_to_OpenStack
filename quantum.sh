@@ -14,7 +14,7 @@ MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 sysctl net.ipv4.ip_forward=1
 
 sudo apt-get update
-sudo apt-get -y upgrade
+#sudo apt-get -y upgrade
 
 sudo apt-get -y install vim linux-headers-`uname -r`
 
@@ -138,7 +138,7 @@ admin_password = quantum
 metadata_proxy_shared_secret = helloOpenStack
 nova_metadata_ip = ${CONTROLLER_HOST}
 nova_metadata_port = 8775
-" > /etc/quantum/metadata_agent.ini
+" | tee -a /etc/quantum/metadata_agent.ini
 
 sudo service quantum-plugin-openvswitch-agent restart
 sudo service quantum-dhcp-agent restart
