@@ -22,7 +22,7 @@ sudo apt-get -y install vlan bridge-utils dnsmasq-base dnsmasq-utils
 
 sudo apt-get -y install openvswitch-switch openvswitch-datapath-dkms
 
-sudo apt-get -y install quantum-dhcp-agent   quantum-l3-agent quantum-plugin-openvswitch quantum-plugin-openvswitch-agent 
+sudo apt-get -y install quantum-dhcp-agent quantum-l3-agent quantum-plugin-openvswitch quantum-plugin-openvswitch-agent 
 
 sudo /etc/init.d/openvswitch-switch start
 
@@ -43,7 +43,38 @@ sudo ip link set eth3 promisc on
 
 # /etc/quantum/api-paste.ini
 rm -f /etc/quantum/api-paste.ini
-cp /vagrant/files/quantum/api-paste.ini /etc/quantum/api-paste.ini
+echo "
+[composite:quantum]
+use = egg:Paste#urlmap
+/: quantumversions
+/v2.0: quantumapi_v2_0
+
+[composite:quantumapi_v2_0]
+use = call:quantum.auth:pipeline_factory
+noauth = extensions quantumapiapp_v2_0
+keystone = authtoken keystonecontext extensions quantumapiapp_v2_0
+
+[filter:keystonecontext]
+paste.filter_factory = quantum.auth:QuantumKeystoneContext.factory
+
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_host = ${CONTROLLER_HOST}
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = quantum
+admin_password = quantum
+
+[filter:extensions]
+paste.filter_factory = quantum.api.extensions:plugin_aware_extension_middleware_factory
+
+[app:quantumversions]
+paste.app_factory = quantum.api.versions:Versions.factory
+
+[app:quantumapiapp_v2_0]
+paste.app_factory = quantum.api.v2.router:APIRouter.factory
+" | tee -a /etc/quantum/api-paste.ini
 
 # /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
 echo "
@@ -60,7 +91,10 @@ enable_tunneling=True
 
 # /etc/quantum/dhcp_agent.ini 
 #echo "root_helper = sudo quantum-rootwrap /etc/quantum/rootwrap.conf" >> /etc/quantum/dhcp_agent.ini
-echo "root_helper = sudo" >> /etc/quantum/dhcp_agent.ini
+echo "
+root_helper = sudo
+use_namespaces = True
+" | tee -a /etc/quantum/dhcp_agent.ini
 
 echo "
 Defaults !requiretty
@@ -90,6 +124,8 @@ auth_region = RegionOne
 admin_tenant_name = service
 admin_user = quantum
 admin_password = quantum
+metadata_ip = ${CONTROLLER_HOST}
+metadata_port = 8775
 use_namespaces = True" | tee -a /etc/quantum/l3_agent.ini
 
 # Metadata Agent
