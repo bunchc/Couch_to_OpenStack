@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       hostname = "%s" % [prefix, (i+1)]
         config.vm.define "#{hostname}" do |box|
           box.vm.hostname = "#{hostname}.book"
-          box.vm.network :private_network, ip: "172.15.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
+          box.vm.network :private_network, ip: "172.16.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "10.10.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "192.168.#{third_octet}.#{ip_start+i}", :netmask => "255.255.255.0"
 
