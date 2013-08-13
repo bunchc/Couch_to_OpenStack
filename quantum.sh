@@ -88,6 +88,9 @@ tunnel_bridge=br-tun
 local_ip=${MY_IP}
 enable_tunneling=True
 root_helper = sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf
+[SECURITYGROUP]
+# Firewall driver for realizing quantum security group function
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 " | tee -a /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
 
 # /etc/quantum/dhcp_agent.ini 

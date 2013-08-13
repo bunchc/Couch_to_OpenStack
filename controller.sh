@@ -388,6 +388,9 @@ tunnel_id_ranges=1:1000
 integration_bridge=br-int
 tunnel_bridge=br-tun
 enable_tunneling=True
+[SECURITYGROUP]
+# Firewall driver for realizing quantum security group function
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 " | tee -a /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
 
 # Configure Quantum
@@ -473,8 +476,12 @@ quantum_admin_password=quantum
 quantum_admin_auth_url=http://${MY_IP}:35357/v2.0
 libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
 linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
-firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+#firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+security_group_api=quantum
+firewall_driver=nova.virt.firewall.NoopFirewallDriver
 
+service_quantum_metadata_proxy=true
+quantum_metadata_proxy_shared_secret=foo
 
 #Metadata
 #metadata_host = ${MYSQL_HOST}
