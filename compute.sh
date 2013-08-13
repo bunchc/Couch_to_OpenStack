@@ -1,5 +1,7 @@
 . /vagrant/common.sh
 
+MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
+
 # OpenStack Controller Private IP for use with generating Cinder target IP
 OSC_PRIV_IP=${CONTROLLER_HOST_PRIV}
 
@@ -13,8 +15,8 @@ export OSCONTROLLER_P=$OSC_PRIV_IP
 nova_compute_install() {
 
 	# Install some packages:
-	sudo apt-get -y --force-yes install nova-api-metadata nova-compute nova-compute-qemu nova-doc nova-network
-	sudo apt-get install -y vlan bridge-utils
+	sudo apt-get -y --force-yes install nova-api-metadata nova-compute nova-compute-qemu nova-doc
+	sudo apt-get install -y vim vlan bridge-utils
 	sudo apt-get install -y libvirt-bin pm-utils sysfsutils
 	sudo service ntp restart
 }
@@ -29,6 +31,58 @@ sysctl net.ipv4.ip_forward=1
 
 # restart libvirt
 sudo service libvirt-bin restart
+
+# OpenVSwitch
+sudo apt-get install -y linux-headers-`uname -r` build-essential
+sudo apt-get install -y openvswitch-switch openvswitch-datapath-dkms
+
+# Make the bridge br-int, used for VM integration
+ovs-vsctl add-br br-int
+
+# Quantum
+sudo apt-get install -y quantum-plugin-openvswitch-agent python-cinderclient
+
+# Configure Quantum
+# /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i "s|sql_connection = sqlite:////var/lib/quantum/ovs.sqlite|sql_connection = mysql://quantum:openstack@${CONTROLLER_HOST}/quantum|g"  /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i 's/# Default: integration_bridge = br-int/integration_bridge = br-int/g' /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i 's/# Default: tunnel_bridge = br-tun/tunnel_bridge = br-tun/g' /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i 's/# Default: enable_tunneling = False/enable_tunneling = True/g' /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i 's/# Example: tenant_network_type = gre/tenant_network_type = gre/g' /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i 's/# Example: tunnel_id_ranges = 1:1000/tunnel_id_ranges = 1:1000/g' /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+#sudo sed -i "s/# Default: local_ip =/local_ip = ${MY_IP}/g" /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+echo "
+[DATABASE]
+sql_connection=mysql://quantum:openstack@${CONTROLLER_HOST}/quantum
+[OVS]
+tenant_network_type=gre
+tunnel_id_ranges=1:1000
+integration_bridge=br-int
+tunnel_bridge=br-tun
+local_ip=${MY_IP}
+enable_tunneling=True
+root_helper = sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf
+[SECURITYGROUP]
+# Firewall driver for realizing quantum security group function
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+" | tee -a /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+
+
+# /etc/quantum/quantum.conf
+sudo sed -i "s/# rabbit_host = localhost/rabbit_host = ${CONTROLLER_HOST}/g" /etc/quantum/quantum.conf
+sudo sed -i 's/# auth_strategy = keystone/auth_strategy = keystone/g' /etc/quantum/quantum.conf
+sudo sed -i "s/auth_host = 127.0.0.1/auth_host = ${CONTROLLER_HOST}/g" /etc/quantum/quantum.conf
+sudo sed -i 's/admin_tenant_name = %SERVICE_TENANT_NAME%/admin_tenant_name = service/g' /etc/quantum/quantum.conf
+sudo sed -i 's/admin_user = %SERVICE_USER%/admin_user = quantum/g' /etc/quantum/quantum.conf
+sudo sed -i 's/admin_password = %SERVICE_PASSWORD%/admin_password = quantum/g' /etc/quantum/quantum.conf
+sudo sed -i 's/^root_helper.*/root_helper = sudo/g' /etc/quantum/quantum.conf
+
+echo "
+Defaults !requiretty
+quantum ALL=(ALL:ALL) NOPASSWD:ALL" | tee -a /etc/sudoers
+
+# Restart Quantum Services
+service quantum-plugin-openvswitch-agent restart
 
 # Nova Conf
 # Clobber the nova.conf file with the following
@@ -65,9 +119,21 @@ ec2_dmz_host=${MYSQL_HOST}
 ec2_private_dns_show_ip=True
 
 # Network settings
-public_interface=eth1
-force_dhcp_release=True
-auto_assign_floating_ip=True
+network_api_class=nova.network.quantumv2.api.API
+quantum_url=http://${CONTROLLER_HOST}:9696
+quantum_auth_strategy=keystone
+quantum_admin_tenant_name=service
+quantum_admin_username=quantum
+quantum_admin_password=quantum
+quantum_admin_auth_url=http://${CONTROLLER_HOST}:35357/v2.0
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
+linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
+#firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+security_group_api=quantum
+firewall_driver=nova.virt.firewall.NoopFirewallDriver
+
+service_quantum_metadata_proxy=true
+quantum_metadata_proxy_shared_secret=foo
 
 #Metadata
 #metadata_host = ${CONTROLLER_HOST}
