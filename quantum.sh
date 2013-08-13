@@ -87,6 +87,7 @@ integration_bridge=br-int
 tunnel_bridge=br-tun
 local_ip=${MY_IP}
 enable_tunneling=True
+root_helper = sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf
 " | tee -a /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
 
 # /etc/quantum/dhcp_agent.ini 
