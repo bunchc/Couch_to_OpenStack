@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 require 'securerandom'
 
+# remove the 'client' entry to below to save on host resources
 nodes = {
     'controller'  => [1, 200],
     'compute'  => [1, 201],
