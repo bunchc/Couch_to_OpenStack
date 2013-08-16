@@ -25,9 +25,9 @@ nova_configure() {
 
 # Networking 
 # ip forwarding
-sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 # To save you from rebooting, perform the following
-sysctl net.ipv4.ip_forward=1
+sudo sysctl net.ipv4.ip_forward=1
 
 # restart libvirt
 sudo service libvirt-bin restart
