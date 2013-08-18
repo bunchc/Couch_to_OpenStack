@@ -1,6 +1,8 @@
 # Vagrant files
 .vagrant/
 .vagrant/*
+.controller
+.stackrc
 
 # Virtual Box disks
 *.vdi
