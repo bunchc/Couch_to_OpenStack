@@ -8,7 +8,7 @@ sudo apt-get -y install ubuntu-cloud-keyring
 echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
 sudo apt-get update
 
-#sudo apt-get -y install
+sudo apt-get -y install vim
 
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 MY_PRIV_IP=$(ifconfig eth2 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')

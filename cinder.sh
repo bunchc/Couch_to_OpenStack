@@ -1,11 +1,17 @@
-#!/bin/bash
+#. /vagrant/common.sh
 
-# cinder.sh
+export DEBIAN_FRONTEND=noninteractive
+export CONTROLLER_HOST=172.16.80.200
+export CONTROLLER_HOST_PRIV=10.10.80.200
+sudo apt-get update
 
-# Authors: Cody Bunch (bunchc@gmail.com)
+# Grizzly Goodness
+sudo apt-get -y install ubuntu-cloud-keyring
+echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/grizzly main" | sudo tee -a /etc/apt/sources.list.d/grizzly.list
+sudo apt-get update
 
-# Source in common env vars
-. /vagrant/common.sh
+sudo apt-get -y install vim
+echo "source /vagrant/stackrc" >> ~/.bashrc
 
 # Install some deps
 sudo apt-get install -y --force-yes vim linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
