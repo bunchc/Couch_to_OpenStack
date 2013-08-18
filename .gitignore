@@ -1,8 +1,11 @@
 # Vagrant files
 .vagrant/
 .vagrant/*
+
+# Dynamic files created during lab build
 .controller
 .stackrc
+*.pem
 
 # Virtual Box disks
 *.vdi
