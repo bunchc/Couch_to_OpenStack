@@ -18,7 +18,7 @@ echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/gri
 sudo apt-get update
 
 sudo apt-get -y install vim
-echo "source /vagrant/stackrc" >> ~/.bashrc
+echo "source /vagrant/.stackrc" >> ~/.bashrc
 
 # The routeable IP of the node is on our eth1 interface
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')

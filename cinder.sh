@@ -11,7 +11,7 @@ echo "deb  http://ubuntu-cloud.archive.canonical.com/ubuntu precise-proposed/gri
 sudo apt-get update
 
 sudo apt-get -y install vim
-echo "source /vagrant/stackrc" >> ~/.bashrc
+echo "source /vagrant/.stackrc" >> ~/.bashrc
 
 # Install some deps
 sudo apt-get install -y --force-yes vim linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
