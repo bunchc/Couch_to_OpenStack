@@ -569,3 +569,4 @@ export CONTROLLER_HOST=${MY_IP}
 export CONTROLLER_HOST_PRIV=${MY_PRIV_IP}
 EOF
 
+echo "source /vagrant/.stackrc" >> ~/.bashrc
