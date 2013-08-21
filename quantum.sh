@@ -39,7 +39,6 @@ sudo ovs-vsctl add-port br-ex eth3
 sudo ifconfig eth3 0.0.0.0 up
 sudo ip link set eth3 promisc on
 
-
 # Configuration
 
 # /etc/quantum/api-paste.ini
@@ -140,7 +139,7 @@ auth_region = RegionOne
 admin_tenant_name = service
 admin_user = quantum
 admin_password = quantum
-metadata_proxy_shared_secret = helloOpenStack
+metadata_proxy_shared_secret = foo
 nova_metadata_ip = ${CONTROLLER_HOST}
 nova_metadata_port = 8775
 " | tee -a /etc/quantum/metadata_agent.ini
