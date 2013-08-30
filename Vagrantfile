@@ -5,10 +5,9 @@ require 'securerandom'
 # remove the 'client' entry to below to save on host resources
 nodes = {
     'controller'  => [1, 200],
-    'compute'  => [1, 201],
+    'compute'  => [2, 201],
     'cinder' => [1, 211],
-    'quantum' => [1, 202],
-    'client' => [1, 100],
+    'quantum' => [1, 202]
 }
 
 
@@ -71,10 +70,10 @@ Vagrant.configure("2") do |config|
             vbox.customize ["modifyvm", :id, "--memory", 1024]
             vbox.customize ["modifyvm", :id, "--cpus", 1]
             if prefix == "compute"
-              vbox.customize ["modifyvm", :id, "--memory", 3128]
+              vbox.customize ["modifyvm", :id, "--memory", 1024]
               vbox.customize ["modifyvm", :id, "--cpus", 2]
             elsif prefix == "controller"
-              vbox.customize ["modifyvm", :id, "--memory", 2048]
+              vbox.customize ["modifyvm", :id, "--memory", 1024]
             elsif prefix == "client" or prefix == "proxy"
               vbox.customize ["modifyvm", :id, "--memory", 512]
             end
