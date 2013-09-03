@@ -20,3 +20,6 @@ MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 
 # Install some packages:
 sudo apt-get -y install vim python-keystoneclient python-glanceclient python-novaclient python-cinderclient python-quantumclient
+
+# Copy files to local system for easy access in case the vagrant share drops
+mkdir c2os && cp /vagrant/* ./c2os/ && cp /vagrant/.stackrc ./c2os/ && sed "s/\/vagrant/~/g" .bashrc

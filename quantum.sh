@@ -160,3 +160,6 @@ sudo service quantum-plugin-openvswitch-agent restart
 sudo service quantum-dhcp-agent restart
 sudo service quantum-l3-agent restart
 sudo service quantum-metadata-agent restart
+
+# Copy files to local system for easy access in case the vagrant share drops
+mkdir c2os && cp /vagrant/* ./c2os/ && cp /vagrant/.stackrc ./c2os/ && sed "s/\/vagrant/~/g" .bashrc

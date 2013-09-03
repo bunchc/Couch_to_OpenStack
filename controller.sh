@@ -570,3 +570,7 @@ export CONTROLLER_HOST_PRIV=${MY_PRIV_IP}
 EOF
 
 echo "source /vagrant/.stackrc" >> ~/.bashrc
+
+# Copy files to local system for easy access in case the vagrant share drops
+mkdir c2os && cp /vagrant/* ./c2os/ && cp /vagrant/.stackrc ./c2os/ && sed "s/\/vagrant/~/g" .bashrc
+
