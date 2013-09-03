@@ -34,6 +34,9 @@ Vagrant.configure("2") do |config|
           box.vm.network :private_network, ip: "172.16.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "10.10.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "192.168.#{third_octet}.#{ip_start+i}", :netmask => "255.255.255.0"
+          if prefix == "client"
+            box.vm.network :forwarded_port, guest: 80, host: 8180
+          end
 
           # Run the Shell Provisioning Script file
           box.vm.provision :shell, :path => "#{prefix}.sh"
