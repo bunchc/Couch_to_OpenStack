@@ -25,9 +25,9 @@ nova_configure() {
 
 # Networking 
 # ip forwarding
-sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 # To save you from rebooting, perform the following
-sysctl net.ipv4.ip_forward=1
+sudo sysctl net.ipv4.ip_forward=1
 
 # restart libvirt
 sudo service libvirt-bin restart
@@ -36,8 +36,18 @@ sudo service libvirt-bin restart
 sudo apt-get install -y linux-headers-`uname -r` build-essential
 sudo apt-get install -y openvswitch-switch openvswitch-datapath-dkms
 
-# Make the bridge br-int, used for VM integration
-ovs-vsctl add-br br-int
+
+# OpenVSwitch Configuration
+#br-int will be used for VM integration
+sudo ovs-vsctl add-br br-int
+
+#br-ex is used to make to VM accessible from the internet
+sudo ovs-vsctl add-br br-ex
+sudo ovs-vsctl add-port br-ex eth3
+
+# Edit the /etc/network/interfaces file for eth3?
+sudo ifconfig eth3 0.0.0.0 up
+sudo ip link set eth3 promisc on
 
 # Quantum
 sudo apt-get install -y quantum-plugin-openvswitch-agent python-cinderclient
