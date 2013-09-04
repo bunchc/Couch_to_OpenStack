@@ -8,7 +8,7 @@ Check the Repo Wiki for instructions on how to use the environment.
 
 ## Usage
 
-	git clone https://github.com/bunchc/Couch_to_OpenStack.git
+	git clone https://github.com/dzimine/Couch_to_OpenStack.git
 	cd Couch_to_OpenStack
 	vagrant up
 
