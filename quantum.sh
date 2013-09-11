@@ -10,6 +10,7 @@
 
 # The routeable IP of the node is on our eth1 interface
 MY_IP=$(ifconfig eth1 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
+ETH3_IP=$(ifconfig eth3 | awk '/inet addr/ {split ($2,A,":"); print A[2]}')
 
 sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 sudo sysctl net.ipv4.ip_forward=1
@@ -38,6 +39,7 @@ sudo ovs-vsctl add-port br-ex eth3
 # Edit the /etc/network/interfaces file for eth3?
 sudo ifconfig eth3 0.0.0.0 up
 sudo ip link set eth3 promisc on
+sudo ifconfig br-ex $ETH3_IP netmask 255.255.255.0
 
 # Configuration
 

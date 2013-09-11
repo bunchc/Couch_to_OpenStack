@@ -554,6 +554,11 @@ mysql -uroot -p$MYSQL_ROOT_PASS -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'
 mysql -uroot -p$MYSQL_ROOT_PASS -e "SET PASSWORD FOR 'cinder'@'%' = PASSWORD('$MYSQL_CINDER_PASS');"
 
 ###############################
+# Everyone loves Horizon dashboard
+###############################
+sudo apt-get install -y openstack-dashboard
+
+###############################
 # OpenStack Deployment Complete
 ###############################
 
