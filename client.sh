@@ -18,8 +18,7 @@ sudo cat > /etc/nagios3/conf.d/controller.cfg <<EOF
 # Generic host definition template - This is NOT a real host, just a template!
 
 define host{
-        name                            generic-host    ; The name of this host template
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         notifications_enabled           1       ; Host notifications are enabled
         event_handler_enabled           1       ; Host event handler is enabled
         flap_detection_enabled          1       ; Flap detection is enabled
@@ -50,77 +49,77 @@ sudo cat > /etc/nagios3/conf.d/openstack_service.cfg <<EOF
 
 # Horizon
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Horizon
-        check_command                   check_nrpe!check_horizon
+        check_command                   check_nrpe_1arg!check_horizon
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 # Keystone
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Keystone-HTTP
-        check_command                   check_nrpe!check_keystone_http
+        check_command                   check_nrpe_1arg!check_keystone_http
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Keystone-Proc
-        check_command                   check_nrpe!check_keystone_proc
+        check_command                   check_nrpe_1arg!check_keystone_proc
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 # Glance
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Glance-HTTP
-        check_command                   check_nrpe!check_glance_http
+        check_command                   check_nrpe_1arg!check_glance_http
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Glance-Proc
-        check_command                   check_nrpe!check_glance_proc
+        check_command                   check_nrpe_1arg!check_glance_proc
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 # Cinder
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Cinder-API-HTTP
-        check_command                   check_nrpe!check_cinder_api_http
+        check_command                   check_nrpe_1arg!check_cinder_api_http
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Cinder-API-Proc
-        check_command                   check_nrpe!check_cinder_api_proc
+        check_command                   check_nrpe_1arg!check_cinder_api_proc
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 # Neutron / Quantum
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Quantum-API-HTTP
-        check_command                   check_nrpe!check_quantum_api_http
+        check_command                   check_nrpe_1arg_1arg!check_quantum_api_http
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
 define service {
-        hostname                        controller.cook.book
+        host_name                       controller.cook.book
         service_description             Quantum-API-Proc
-        check_command                   check_nrpe!check_quantum_api_proc
+        check_command                   check_nrpe_1arg!check_quantum_api_proc
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
