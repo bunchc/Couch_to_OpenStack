@@ -576,3 +576,26 @@ export CONTROLLER_HOST=${MY_IP}
 export CONTROLLER_HOST_PRIV=${MY_PRIV_IP}
 EOF
 
+###
+# Time for nagios
+###
+sudo apt-get install -y nagios-nrpe-server
+sudo sed -i "s/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,172.16.80.100/" /etc/nagios/nrpe.cfg
+
+# Setup our check commands:
+sudo cat > /etc/nagios/checks.cfg <<EOF
+command[check_horizon]=/usr/lib/nagios/plugins/check_http localhost -u /horizon -R username
+command[check_keystone_http]=/usr/lib/nagios/plugins/check_http localhost -p 5000 -R application/vnd.openstack.identity-v3
+command[check_keystone_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -u keystone
+command[check_glance_http]=/usr/lib/nagios/plugins/check_http localhost -p 9292 -R "SUPPORTED"
+command[check_glance_proc]=/usr/lib/nagios/plugins/check_procs -w 4: -u glance
+command[check_cinder_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 8776 -R "CURRENT"
+command[check_quantum_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 9696 -R "CURRENT"
+command[check_quantum_api_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -C python -a quantum-server
+EOF
+
+# Include our check commands
+sudo echo "include=/etc/nagios/checks.cfg" >> /etc/nagios/nrpe.cfg
+
+# Restart the service
+sudo service nagios-nrpe-server restart
