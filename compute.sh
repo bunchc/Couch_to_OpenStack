@@ -209,3 +209,22 @@ nova_restart() {
 nova_compute_install
 nova_configure
 nova_restart
+
+###
+# Time for nagios
+###
+sudo apt-get install -y nagios-nrpe-server
+sudo sed -i "s/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,172.16.80.100/" /etc/nagios/nrpe.cfg
+
+# Setup our check commands:
+sudo cat > /etc/nagios/checks.cfg <<EOF
+#command[check_nova_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 9696 -R "CURRENT"
+#command[check_nova_api_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -C python -a quantum-server
+EOF
+
+# Include our check commands
+sudo echo "include=/etc/nagios/checks.cfg" >> /etc/nagios/nrpe.cfg
+
+# Restart the service
+sudo service nagios-nrpe-server stop
+sudo service nagios-nrpe-server stop

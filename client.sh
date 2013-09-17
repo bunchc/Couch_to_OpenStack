@@ -19,6 +19,7 @@ sudo cat > /etc/nagios3/conf.d/controller.cfg <<EOF
 
 define host{
         host_name                       controller.cook.book
+        address                         172.16.80.200
         notifications_enabled           1       ; Host notifications are enabled
         event_handler_enabled           1       ; Host event handler is enabled
         flap_detection_enabled          1       ; Flap detection is enabled
@@ -40,8 +41,11 @@ sudo cp /etc/nagios3/conf.d/controller.cfg /etc/nagios3/conf.d/compute.cfg
 sudo cp /etc/nagios3/conf.d/controller.cfg /etc/nagios3/conf.d/cinder.cfg
 sudo cp /etc/nagios3/conf.d/controller.cfg /etc/nagios3/conf.d/quantum.cfg
 sudo sed -i "s/controller/compute/" /etc/nagios3/conf.d/compute.cfg
+sudo sed -i "s/172.16.80.200/172.16.80.201/" /etc/nagios3/conf.d/compute.cfg
 sudo sed -i "s/controller/cinder/" /etc/nagios3/conf.d/cinder.cfg
+sudo sed -i "s/172.16.80.200/172.16.80.211/" /etc/nagios3/conf.d/cinder.cfg
 sudo sed -i "s/controller/quantum/" /etc/nagios3/conf.d/quantum.cfg
+sudo sed -i "s/172.16.80.200/172.16.80.202/" /etc/nagios3/conf.d/quantum.cfg
 
 # Create our NRPE checks
 sudo cat > /etc/nagios3/conf.d/openstack_service.cfg <<EOF
@@ -92,7 +96,7 @@ define service {
 
 # Cinder
 define service {
-        host_name                       controller.cook.book
+        host_name                       cinder.cook.book
         service_description             Cinder-API-HTTP
         check_command                   check_nrpe_1arg!check_cinder_api_http
         use                             generic-service
@@ -100,7 +104,7 @@ define service {
 }
 
 define service {
-        host_name                       controller.cook.book
+        host_name                       cinder.cook.book
         service_description             Cinder-API-Proc
         check_command                   check_nrpe_1arg!check_cinder_api_proc
         use                             generic-service
@@ -111,7 +115,7 @@ define service {
 define service {
         host_name                       controller.cook.book
         service_description             Quantum-API-HTTP
-        check_command                   check_nrpe_1arg_1arg!check_quantum_api_http
+        check_command                   check_nrpe_1arg!check_quantum_api_http
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }

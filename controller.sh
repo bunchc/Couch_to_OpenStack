@@ -589,7 +589,6 @@ command[check_keystone_http]=/usr/lib/nagios/plugins/check_http localhost -p 500
 command[check_keystone_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -u keystone
 command[check_glance_http]=/usr/lib/nagios/plugins/check_http localhost -p 9292 -R "SUPPORTED"
 command[check_glance_proc]=/usr/lib/nagios/plugins/check_procs -w 4: -u glance
-command[check_cinder_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 8776 -R "CURRENT"
 command[check_quantum_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 9696 -R "CURRENT"
 command[check_quantum_api_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -C python -a quantum-server
 EOF
@@ -598,4 +597,5 @@ EOF
 sudo echo "include=/etc/nagios/checks.cfg" >> /etc/nagios/nrpe.cfg
 
 # Restart the service
-sudo service nagios-nrpe-server restart
+sudo service nagios-nrpe-server stop
+sudo service nagios-nrpe-server stop
