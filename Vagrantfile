@@ -5,10 +5,11 @@ require 'securerandom'
 # remove the 'client' entry to below to save on host resources
 nodes = {
     'controller'  => [1, 200],
-    'compute'  => [1, 201],
+    'compute'  => [2, 201],
     'cinder' => [1, 211],
-    'quantum' => [1, 202],
-    'client' => [1, 100],
+    'client' => [1, 100]
+    # Try without quantum...
+    # , 'quantum' => [1, 202]
 }
 
 
@@ -27,12 +28,15 @@ Vagrant.configure("2") do |config|
 
   nodes.each do |prefix, (count, ip_start)|
     count.times do |i|
-      hostname = "%s" % [prefix, (i+1)]
+      hostname = (count == 1 ? prefix : prefix+"-#{i+1}")
         config.vm.define "#{hostname}" do |box|
           box.vm.hostname = "#{hostname}.book"
           box.vm.network :private_network, ip: "172.16.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "10.10.#{third_octet}.#{ip_start+i}", :netmask => "255.255.0.0"
           box.vm.network :private_network, ip: "192.168.#{third_octet}.#{ip_start+i}", :netmask => "255.255.255.0"
+          if prefix == "client"
+            box.vm.network :forwarded_port, guest: 80, host: 8180
+          end
 
           # Run the Shell Provisioning Script file
           box.vm.provision :shell, :path => "#{prefix}.sh"
@@ -71,11 +75,11 @@ Vagrant.configure("2") do |config|
             vbox.customize ["modifyvm", :id, "--memory", 1024]
             vbox.customize ["modifyvm", :id, "--cpus", 1]
             if prefix == "compute"
-              vbox.customize ["modifyvm", :id, "--memory", 3128]
+              vbox.customize ["modifyvm", :id, "--memory", 1024]
               vbox.customize ["modifyvm", :id, "--cpus", 2]
               vbox.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
             elsif prefix == "controller"
-              vbox.customize ["modifyvm", :id, "--memory", 2048]
+              vbox.customize ["modifyvm", :id, "--memory", 1024]
             elsif prefix == "client" or prefix == "proxy"
               vbox.customize ["modifyvm", :id, "--memory", 512]
 	    elsif prefix == "quantum"
