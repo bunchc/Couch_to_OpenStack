@@ -129,5 +129,41 @@ define service {
 }
 EOF
 
+sudo cat > /etc/nagios3/conf.d/openstack_compute_services.cfg <<EOF
+# Compute all the computes
+
+define service {
+        host_name                       compute.cook.book
+        service_description             Nova Processes
+        check_command                   check_nrpe_1arg!check_nova_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+define service {
+        host_name                       compute.cook.book
+        service_description             Quantum Services
+        check_command                   check_nrpe_1arg!check_quantum_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+define service {
+        host_name                       compute.cook.book
+        service_description             Open vSwitch - ovswitchd
+        check_command                   check_nrpe_1arg!check_ovswitch_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+define service {
+        host_name                       compute.cook.book
+        service_description             Open vSwitch - ovsdb-server
+        check_command                   check_nrpe_1arg!check_ovswitch_server_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+EOF
+
 # Restart the service
 sudo service nagios3 restart

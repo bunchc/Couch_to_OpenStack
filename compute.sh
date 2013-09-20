@@ -218,8 +218,10 @@ sudo sed -i "s/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,172.16.80.100/" /
 
 # Setup our check commands:
 sudo cat > /etc/nagios/checks.cfg <<EOF
-#command[check_nova_api_http]=/usr/lib/nagios/plugins/check_http localhost -p 9696 -R "CURRENT"
-#command[check_nova_api_proc]=/usr/lib/nagios/plugins/check_procs -w 1 -C python -a quantum-server
+command[check_nova_proc]=/usr/lib/nagios/plugins/check_procs -w 4: -u nova
+command[check_quantum_proc]=/usr/lib/nagios/plugins/check_procs -w 1: -u quantum
+command[check_ovswitch_proc]=/usr/lib/nagios/plugins/check_procs -w 2 -C ovs-vswitchd
+command[check_ovswitch_server_proc]=/usr/lib/nagios/plugins/check_procs -w 2 -C ovsdb-server
 EOF
 
 # Include our check commands
