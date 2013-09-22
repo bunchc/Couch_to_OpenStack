@@ -175,8 +175,16 @@ sudo cat > /etc/nagios3/conf.d/openstack_quantum_services.cfg <<EOF
 # Yes Quantum, it's Grizzly, prior to the name change ;-)
 define service {
         host_name                       quantum.cook.book
-        service_description             Quantum-API-HTTP
-        check_command                   check_nrpe_1arg!check_quantum_http
+        service_description             Quantum-ovsdb-server
+        check_command                   check_nrpe_1arg!check_ovsdbserver
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+define service {
+        host_name                       quantum.cook.book
+        service_description             Quantum-ovs-vswitchd
+        check_command                   check_nrpe_1arg!check_ovsvswitchd
         use                             generic-service
         notification_interval           0 ; set > 0 if you want to be renotified
 }
