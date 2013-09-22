@@ -598,4 +598,4 @@ sudo echo "include=/etc/nagios/checks.cfg" >> /etc/nagios/nrpe.cfg
 
 # Restart the service
 sudo service nagios-nrpe-server stop
-sudo service nagios-nrpe-server stop
+sudo service nagios-nrpe-server start

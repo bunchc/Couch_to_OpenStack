@@ -47,7 +47,8 @@ sudo sed -i "s/172.16.80.200/172.16.80.211/" /etc/nagios3/conf.d/cinder.cfg
 sudo sed -i "s/controller/quantum/" /etc/nagios3/conf.d/quantum.cfg
 sudo sed -i "s/172.16.80.200/172.16.80.202/" /etc/nagios3/conf.d/quantum.cfg
 
-# Create our NRPE checks
+# Nagios config for OpenStac "Controller"
+# That is to say, Horizon, Keystone, Glance, Quantum-API, OVS
 sudo cat > /etc/nagios3/conf.d/openstack_service.cfg <<EOF
 # Controller Services
 
@@ -94,23 +95,6 @@ define service {
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
-# Cinder
-define service {
-        host_name                       cinder.cook.book
-        service_description             Cinder-API-HTTP
-        check_command                   check_nrpe_1arg!check_cinder_api_http
-        use                             generic-service
-        notification_interval           0 ; set > 0 if you want to be renotified
-}
-
-define service {
-        host_name                       cinder.cook.book
-        service_description             Cinder-API-Proc
-        check_command                   check_nrpe_1arg!check_cinder_api_proc
-        use                             generic-service
-        notification_interval           0 ; set > 0 if you want to be renotified
-}
-
 # Neutron / Quantum
 define service {
         host_name                       controller.cook.book
@@ -129,6 +113,7 @@ define service {
 }
 EOF
 
+# Nagios services configuration for Compute Services
 sudo cat > /etc/nagios3/conf.d/openstack_compute_services.cfg <<EOF
 # Compute all the computes
 
@@ -163,6 +148,46 @@ define service {
         notification_interval           0 ; set > 0 if you want to be renotified
 }
 
+EOF
+
+# Nagios services configuration for Cinder Node
+sudo cat > /etc/nagios3/conf.d/openstack_cinder_services.cfg <<EOF
+# Cinder
+define service {
+        host_name                       cinder.cook.book
+        service_description             Cinder-API-HTTP
+        check_command                   check_nrpe_1arg!check_cinder_http
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+define service {
+        host_name                       cinder.cook.book
+        service_description             Cinder-API-Proc
+        check_command                   check_nrpe_1arg!check_cinder_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+EOF
+
+# Nagios services configuration for Quantum Node
+sudo cat > /etc/nagios3/conf.d/openstack_quantum_services.cfg <<EOF
+# Yes Quantum, it's Grizzly, prior to the name change ;-)
+define service {
+        host_name                       quantum.cook.book
+        service_description             Quantum-API-HTTP
+        check_command                   check_nrpe_1arg!check_quantum_http
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
+
+define service {
+        host_name                       quantum.cook.book
+        service_description             Quantum-API-Proc
+        check_command                   check_nrpe_1arg!check_quantum_proc
+        use                             generic-service
+        notification_interval           0 ; set > 0 if you want to be renotified
+}
 EOF
 
 # Restart the service

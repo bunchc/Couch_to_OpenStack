@@ -64,3 +64,22 @@ vgcreate cinder-volumes /dev/loop2
 
 # Restart services
 cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done
+
+###
+# Time for nagios
+###
+sudo apt-get install -y nagios-nrpe-server
+sudo sed -i "s/allowed_hosts=127.0.0.1/allowed_hosts=127.0.0.1,172.16.80.100/" /etc/nagios/nrpe.cfg
+
+# Setup our check commands:
+sudo cat > /etc/nagios/checks.cfg <<EOF
+command[check_cinder_proc]=/usr/lib/nagios/plugins/check_procs -w 4: -u cinder
+command[check_cinder_http]=/usr/lib/nagios/plugins/check_http localhost -p 8776 -R "CURRENT"
+EOF
+
+# Include our check commands
+sudo echo "include=/etc/nagios/checks.cfg" >> /etc/nagios/nrpe.cfg
+
+# Restart the service
+sudo service nagios-nrpe-server stop
+sudo service nagios-nrpe-server start
