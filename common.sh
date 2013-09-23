@@ -1,6 +1,5 @@
 source /vagrant/.controller
 export DEBIAN_FRONTEND=noninteractive
-echo 'Acquire::http { Proxy "http://'162.209.50.108:3142'"; };' | sudo tee /etc/apt/apt.conf.d/01apt-cacher-ng-proxy
 
 sudo apt-get update
 
