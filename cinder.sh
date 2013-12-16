@@ -8,7 +8,7 @@
 . /vagrant/common.sh
 
 # Install some deps
-sudo apt-get install -y --force-yes vim linux-headers-`uname -r` build-essential python-mysqldb xfsprogs
+sudo apt-get install -y --force-yes vim linux-headers-`uname -r` build-essential python-mysqldb xfsprogs qemu-utils
 
 # Install Cinder Things
 sudo apt-get install -y --force-yes cinder-api cinder-scheduler cinder-volume open-iscsi python-cinderclient tgt sysfsutils
@@ -30,7 +30,8 @@ OSC_PRIV_IP=${CONTROLLER_HOST_PRIV}
 export OSCONTROLLER_P=$OSC_PRIV_IP
 
 # /etc/cinder/cinder.conf
-cat > /etc/cinder/cinder.conf <<EOF
+
+echo "
 [DEFAULT]
 rootwrap_config=/etc/cinder/rootwrap.conf
 sql_connection = mysql://cinder:openstack@${CONTROLLER_HOST}/cinder
@@ -50,17 +51,15 @@ iscsi_ip_address = $(echo $OSCONTROLLER_P | sed 's/\.[0-9]*$/.211/')
 rabbit_host = ${CONTROLLER_HOST}
 rabbit_port = 5672
 state_path = /var/lib/cinder/
-EOF
+glance_host = ${CONTROLLER_HOST}
+" | sudo tee -a /etc/cinder/cinder.conf
 
 # Sync DB
 cinder-manage db sync
 
-# Setup loopback FS for iscsi
-dd if=/dev/zero of=cinder-volumes bs=1 count=0 seek=5G
 
-losetup /dev/loop2 cinder-volumes
-pvcreate /dev/loop2
-vgcreate cinder-volumes /dev/loop2
+pvcreate /dev/sdb
+vgcreate cinder-volumes /dev/sdb
 
 # Restart services
 cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done

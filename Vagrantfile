@@ -2,13 +2,15 @@
 # vi: set ft=ruby :
 require 'securerandom'
 
-# remove the 'client' entry to below to save on host resources
+# comment the 'proxy' entry to below to save on host resources
+# swift all-in-one (saio) node is disabled by default, uncomment to enable 
 nodes = {
+    'proxy' => [1,10],
     'controller'  => [1, 200],
     'compute'  => [1, 201],
     'cinder' => [1, 211],
-    'quantum' => [1, 202],
-    'client' => [1, 100],
+    'neutron' => [1, 202],
+#    'saio'   => [1, 220],
 }
 
 
@@ -22,8 +24,12 @@ Vagrant.configure("2") do |config|
   # We assume virtualbox, if using Fusion, you'll want to change this as needed
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-  #VMware Fusion\Workstation Users: Comment the line above and uncomment the appropriate line below
-  #config.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+  config.vm.provider "vmware_fusion" do |v, override|
+    override.vm.box = "precise64"
+    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+  end
+
+#  config.vm.synced_folder ".", "/vagrant", nfs: true
 
   nodes.each do |prefix, (count, ip_start)|
     count.times do |i|
@@ -42,10 +48,10 @@ Vagrant.configure("2") do |config|
           # Default  
             v.vmx["memsize"] = 1024
             if prefix == "compute"
-              v.vmx["memsize"] = 3128
+              v.vmx["memsize"] = 2048
               v.vmx["numvcpus"] = 2
             elsif prefix == "controller"
-              v.vmx["memsize"] = 2048
+              v.vmx["memsize"] = 1024
             elsif prefix == "client" or prefix == "proxy"
               v.vmx["memsize"] = 512
             end
@@ -68,17 +74,20 @@ Vagrant.configure("2") do |config|
           # If using VirtualBox
           box.vm.provider :virtualbox do |vbox|
 	  # Defaults
-            vbox.customize ["modifyvm", :id, "--memory", 1024]
+            vbox.customize ["modifyvm", :id, "--memory", 768]
             vbox.customize ["modifyvm", :id, "--cpus", 1]
             if prefix == "compute"
-              vbox.customize ["modifyvm", :id, "--memory", 3128]
+              vbox.customize ["modifyvm", :id, "--memory", 2048]
               vbox.customize ["modifyvm", :id, "--cpus", 2]
               vbox.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
             elsif prefix == "client" or prefix == "proxy"
               vbox.customize ["modifyvm", :id, "--memory", 512]
-	    elsif prefix == "quantum"
+	        elsif prefix == "neutron"
               vbox.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
-            end
+            elsif prefix == "cinder"
+              vbox.customize ["createhd", "--filename", "cinder_disk_2.vdi", "--size", 2000 * 1024]
+              vbox.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1, "--device", 0, "--type","hdd", "--medium","cinder_disk_2.vdi"]
+           end
           end  
         end
       end
