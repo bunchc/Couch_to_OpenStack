@@ -22,9 +22,26 @@ Vagrant.configure("2") do |config|
   # We assume virtualbox, if using Fusion, you'll want to change this as needed
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-  #VMware Fusion\Workstation Users: Comment the line above and uncomment the appropriate line below
-  #config.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+  config.vm.provider "vmware_fusion" do |v, override|
+    override.vm.box = "precise64"
+    override.vm.box_url = "http://grahamc.com/vagrant/ubuntu-12.04.2-server-amd64-vmware-fusion.box"
+    override.vm.synced_folder ".", "/vagrant", type: "nfs"
 
+    # Fusion Performance Hacks
+    v.vmx["logging"] = "FALSE"
+    v.vmx["MemTrimRate"] = "0"
+    v.vmx["MemAllowAutoScaleDown"] = "FALSE"
+    v.vmx["mainMem.backing"] = "swap"
+    v.vmx["sched.mem.pshare.enable"] = "FALSE"
+    v.vmx["snapshot.disabled"] = "TRUE"
+    v.vmx["isolation.tools.unity.disable"] = "TRUE"
+    v.vmx["unity.allowCompostingInGuest"] = "FALSE"
+    v.vmx["unity.enableLaunchMenu"] = "FALSE"
+    v.vmx["unity.showBadges"] = "FALSE"
+    v.vmx["unity.showBorders"] = "FALSE"
+    v.vmx["unity.wasCapable"] = "FALSE"
+  end
+  
   nodes.each do |prefix, (count, ip_start)|
     count.times do |i|
       hostname = "%s" % [prefix, (i+1)]
