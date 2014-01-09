@@ -48,7 +48,7 @@ nova boot --flavor 1 --image ${UBUNTU} --key_name demokey test1
 
 quantum net-create --tenant-id ${TENANT_ID} ext_net --router:external=True
 
-quantum subnet-create --tenant-id ${TENANT_ID} --name cookbook_float_subnet_1 --allocation-pool start=192.168.100.10,end=192.168.100.20 --gateway 192.168.100.1 ext_net 192.168.100.0/24 --enable_dhcp=False
+quantum subnet-create --tenant-id ${TENANT_ID} --name cookbook_float_subnet_1 --allocation-pool start=192.168.80.10,end=192.168.80.20 --gateway 192.168.80.1 ext_net 192.168.80.0/24 --enable_dhcp=False
 
 ROUTER_ID=$(quantum router-list \
   | awk '/\ cookbook_router_1\ / {print $2}')
@@ -62,6 +62,6 @@ quantum router-gateway-set \
 
 quantum floatingip-create --tenant-id ${TENANT_ID} ext_net
 VM_PORT=$(quantum port-list | awk '/10.200.0.2/ {print $2}')
-FLOAT_ID=$(quantum floatingip-list | awk '/192.168.100.11/ {print $2}')
+FLOAT_ID=$(quantum floatingip-list | awk '/192.168.80.11/ {print $2}')
 quantum floatingip-associate ${FLOAT_ID} ${VM_PORT}
 
