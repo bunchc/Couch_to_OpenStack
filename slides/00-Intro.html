@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Couch to OpenStack
+## IceHouse Edition
+
+---
+
+# Some Logistics
+
+- Subscribe to the series:
+- Recordings:
+- Get Support here:
+
+---
+
+# Join the Conversation
+
+- On Twitter, use the #vBrownBag hash tag
+- We're also on G+ here:
+
+---
+
+# The Series
+
+- Intro & Lab Setup << We're here
+- What's new in IceHouse
+- Basic Ops
+- Storage
+  - Review: OpenStack Storage Options
+- Networking
+  - Review: Nova-Networking
+  - Review: Neutron
+- Using Heat!
+- Metering
+- Triple-O
+- Others?
+
+---
+
+# Today's Agenda
+
+- Introduction to the series
+- Prerequisites, tools, etc
+- Installing the lab tools
+  - Install Virtualbox
+  - Install Vagrant
+  - Install Vagrant-cachier (or work around it)
+  - Install git
+- Starting the lab environment
+
+---
+class: center, middle
+
+# Introduction to the series
+
+---
+
+# What is the second edition of Couch to OpenStack?
+
+- Designed to work like a 'Bridge to 10k' program
+- Answer the "I've installed OpenStack, now what?"
+- Take the basic fitness from the first C2OS to the next level
+- Still not super deep, but super effective
+- Not super formal. Participation drives direction.
+  - That is, we'll teach what you want to learn.
+- Community driven.
+  - Want to help? Ping us on Twitter, GH, G+, email, etc
+  - We always need hosts, presenters, and more.
+
+---
+
+# Making the most of the series
+
+- Participate on Twitter & G+
+- Do the "homework"
+- Play around
+- Ask questions
+
+Really, it's quite boring and quite one-sided if I do this all myself.
+
+---
+
+# On Distributions, etc
+
+During this series, we will not use a particular distribution. Nor will we use anything beyond Vagrant and bash scripts for deployment. This is because we want you to focus on the concepts and working with OpenStack, rather than the substrate. If we do this right, all of the skills you build here, will work in whatever distribution you choose to go to production on.
+
+For those who were with us last time, we've moved to the OpenStack Cookbook repo entirely now.
+
+---
+class: center, middle
+
+# Prerequisites, tools, etc
+
+---
+
+# Prerequisites
+
+Knowledge:
+- Some basic Linux skill is assumed.
+  - e.g. You can login, run basic commands
+- Some basic OpenStack knowledge is assumed.
+  - That is, we won't rehash 'what' OpenStack is.
+  - That is here: http://openstack.prov12n.com/openstack_phase_1/
+
+Tools:
+- Computer with ~8gb ram. More is always better
+  - Less could work to, but things taper off non-lineally below 8.
+- Vagrant (vagrantup.com)
+- VirtualBox
+  - VMware Workstation or Fusion works too *
+- Git (github.com)
+
+\* Since we're using Vagrant to run Fusion / Workstation, you will need to pay an additional license. Sorry.
+
+---
+class: center, middle
+
+# Installing the lab tools
+
+---
+class: center, middle
+# Demo: Installing Virtualbox
+## Windows Installation
+
+---
+class: center, middle
+# Demo: Installing Vagrant
+## Windows Installation
+
+---
+class: center, middle
+# Demo: Installing Vagrant-Cachier
+## Windows Installation
+
+---
+class: center, middle
+# Demo: Installing Git
+## Windows Installation
+
+---
+class: center, middle
+# Demo: Getting the Lab Scripts
+
+---
+# Demo: Getting the Lab Scripts
+
+git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git
+
+cd OpenStackCookbook
+
+git checkout icehouse
+
+git branch -a
+
+---
+class: center, middle
+# Demo: Starting the Lab Environment
+
+---
+# Demo: Starting the Lab Environment
+
+vagrant status
+
+vagrant up
+
+---
+# Summary
+
+---
+# See you next week.
+
+Don't forget, if you have questions, our G+ group is here:
+
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

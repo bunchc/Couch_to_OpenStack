@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Couch to OpenStack
+## IceHouse Edition
+
+---
+class: center, middle
+
+# Vagrant up, now.
+## If you're playing along that is.
+
+---
+
+# Some Logistics
+
+- Subscribe to the series:
+- Recordings:
+- Get Support here:
+
+---
+
+# Join the Conversation
+
+- On Twitter, use the #vBrownBag hash tag
+- We're also on G+ here:
+
+---
+
+# The Series
+
+- Intro & Lab Setup
+- What's new in IceHouse << We're here
+- Basic Ops
+- Storage
+  - Review: OpenStack Storage Options
+- Networking
+  - Review: Nova-Networking
+  - Review: Neutron
+- Using Heat!
+- Metering
+- Triple-O
+- Others?
+
+---
+
+# Today's Agenda
+
+- IceHouse!
+- What Changed in Nova
+- What Changed in Glance
+- What Changed in Horizon
+- What Changed in Keystone
+- What Changed in Neutron
+- What Changed in Cinder
+- What Changed in Ceilometer
+- What Changed in Heat
+- What Changed in Trove
+
+---
+class: center, middle
+
+# What's New?
+
+---
+
+# What Changed in Nova
+
+- For HV Specifics, see release notes.
+- API
+  - XML going away
+  - “ExtendedServiceDelete” – Decommission old compute nodes
+  - nova hypervisor-show (shows IP)
+- Scheduler
+  - Caching scheduler driver
+  - Namespace image/host matching
+  - Server Groups
+- Other
+  - File injection is off by default
+  - Notifications when host actions happen
+  - nova.conf enhancements
+  - Instance garbage collection *
+
+\* If an instance was deleted but is still running, nova can be configured to act on it in a specific way.
+
+---
+
+# What Changed in Glance
+
+- VMware datastore as backend
+- Image location selection strategy
+  - https://blueprints.launchpad.net/glance/+spec/image-location-selection-strategy
+- Storage quota calculation now excludes deleted images
+
+---
+
+# What Changed in Horizon
+
+ALL THE THINGS. Or more of them than I can cover in a few slides.
+
+---
+
+# Demo: What's new in Horizon
+
+---
+
+# What Changed in Keystone
+
+- API v3 Updates
+- Authorization & Authentication data backends are now completely separate
+- Token KVS can use Redis, Cassandra, etc
+- policy.json updates
+- Cloud Audit Data Federation
+  - http://www.dmtf.org/standards/cadf
+- LDAP Group/Role assignments
+- Token Revocation Events
+- Configurable API Response Truncation
+
+---
+
+# What Changed in Neutron
+
+- New Drivers
+  - IBM, Nuage, OpenDaylight
+- LBaaS
+  - NetScaler
+  - Radware
+- VPN Driver
+  - Cisco CSR
+
+---
+
+# What Changed in Cinder
+
+- Change volume type
+- Metadata support for backups
+- Multi-API worker processes
+- Delete Quota
+- Import / Export Backups
+- Update Volume Encryption
+- Metering Notifications (attach/detach)
+- More drivers
+
+---
+
+# What Changed in Ceilometer
+
+- Better alarms
+  - Time constraints
+  - rate-based meters
+- Storage Drivers
+  - HBase, DB2, SQLAlchemy
+  - Better resource queries
+  - HBase Alarms
+- New Metric Sources
+  - vCenter API
+  - SNMP for bare metal
+  - OpenDaylight REST
+  - Neutron 'north-bound' API
+
+---
+
+# What Changed in Heat
+
+- HOT Templates are now both supported and recommended
+- Better OpenStack Native Resource Coverage
+- Non-Admin users can launch stacks
+- Operator API covering /all/ stacks
+- Autoscaling resources
+- Heat Engine scaling
+- Stack Abandon / Adopt
+- Stack Preview
+
+---
+
+# What Changed in Trove
+
+- User / Schema management
+- Multiple DB Support
+  - MySQL, Percona
+  - MongoDB, Redis, Cassandra (Experimental)
+- Resize up/down
+- Config Groups
+- Backup / Restore
+
+---
+# Summary
+
+---
+# See you next week.
+
+Don't forget, if you have questions, our G+ group is here:
+
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

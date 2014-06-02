@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Couch to OpenStack
+## IceHouse Edition
+
+---
+
+class: center, middle
+
+# Vagrant up, now.
+## If you're playing along that is.
+
+---
+
+# Some Logistics
+
+- Subscribe to the series:
+- Recordings:
+- Get Support here:
+
+---
+
+# Join the Conversation
+
+- On Twitter, use the #vBrownBag hash tag
+- We're also on G+ here:
+
+---
+
+# The Series
+
+- Intro & Lab Setup
+- What's new in IceHouse
+- Basic Ops << We're here
+- Storage
+  - Review: OpenStack Storage Options
+- Networking
+  - Review: Nova-Networking
+  - Review: Neutron
+- Using Heat!
+- Metering
+- Triple-O
+- Others?
+
+---
+
+# Today's Agenda
+
+- State of the Stack
+- User Operations
+- 
+- 
+
+---
+class: center, middle
+
+# State of the Stack
+
+---
+
+# State of the Stack
+
+- Checking Service Status
+  - OpenStack CLI
+  - Is the port open?
+  - Is the process running?
+- Log files?
+
+---
+
+# Demo: Checking Service Status - Getting Logged in
+
+    vagrant ssh controller
+    sudo su -
+    source /vagrant/openrc
+
+
+---
+
+# Demo: Checking Service Status - openstackcli
+
+    apt-get install -y python-openstackcli
+    openstack --help | grep list | less
+    openstack compute service list
+    openstack server list
+    openstack flavor list
+    openstack project list
+    openstack project usage list
+    openstack user list
+    openstack role list
+
+---
+
+# Demo: Checking Service Status - Service Specific CLI
+
+    nova-manage service list
+    nova list
+    nova flavor-list
+    glance image-list
+    keystone tenant-list
+    keystone user-list
+    keystone role-list
+
+---
+
+# Demo: Checking Service Status - Is the port open?
+
+Common ports:
+
+| Service | Port |
+|:------- | ----:|
+| Horizon | 80 |
+| Glance | 9292 |
+| Nova | 8774 |
+| Neutron | 9696 |
+| Cinder | 3260 |
+| Keystone | 5000 |
+| Swift | 8080 |
+
+    netstat -anlp | grep [port]
+
+---
+
+# Demo: Checking Service Status - Are the processes running?
+
+Each service can have a number of running processes. Use the following to check on them:
+
+    ps -ef | grep glance
+    ps -ef | grep apache
+    ps -ef | grep nova
+    ps -ef | grep neutron
+    ps -ef | grep cinder
+    ps -ef | grep keystone
+    ps -ef | grep rabbit
+
+---
+
+# Log Files!
+
+An important task in finding out the current 'state of the stack' as it were, in addition to checking the above service status, quotas, users and the like, is knowing where the logs are. Typically this is:
+
+    /var/log/[servicename]
+
+*We'll save centralized logging and reporting for another lesson*
+
+---
+class: center, middle
+
+# User Operations
+
+---
+
+# User Operations
+
+- CRUD a User
+- CRUD a Tenant
+- CRUD a Role
+- CRUD a Service
+
+---
+
+# CRUD all the things??
+
+Why are we spending time on CRUD operations in OpenStack?
+
+Well, they're honestly pretty simple. In fact in most cases stupidly so. However, there are some little gotchas you should pay attention to. Specifically around deleting:
+
+Deleting a thing:
+- Check what tenants, roles, or users are part of it
+- Check what services might depend on it
+- Remove the user
+---
+
+# Demo: User things
+
+- A user:
+    keystone tenant-list
+    keystone user create --name "vbrownbag" --tenant [tenant_id] --pass "vbrownbag" --enabled true
+- Lots of users
+    for i in `curl -L http://raw.github.com/Couch_to_OpenStack/`; do openstack user create
+
+
+---
+
+
+---
+# Summary
+
+---
+# See you next week.
+
+Don't forget, if you have questions, our G+ group is here:
+
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>

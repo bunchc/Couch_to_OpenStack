@@ -1,14 +1,5 @@
 # Couch To OpenStack
 
-Contained in this repo are the scripts and supporting files for the Couch to OpenStack series of #vBrownBag podcasts.
+This repo contains the slides and supporting files for the Couch to OpenStack series. Specifically, the "bridge to 10k" edition. This time around, we're using the OpenStack Cookbook repo as the backbone for this and building on that.
 
-The podcast, slides, etc are available here: http://openstack.prov12n.com/about-couch-to-openstack/
-
-Check the Repo Wiki for instructions on how to use the environment.
-
-## Usage
-
-	git clone https://github.com/bunchc/Couch_to_OpenStack.git
-	cd Couch_to_OpenStack
-	vagrant up
-
+All of the recordings can be found here: http://openstack.prov12n.com/about-couch-to-openstack/
