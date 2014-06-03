@@ -69,8 +69,9 @@ class: center, middle
 
 - State of the Stack
 - User Operations
-- 
-- 
+- Compute Operations
+- Storage Operations
+- Network Operations
 
 ---
 class: center, middle
@@ -192,17 +193,37 @@ Deleting a thing:
 - Remove the user
 ---
 
-# Demo: User things
+# Demo: Crud the things
+
+For the few user related operations we've touched on, the command format is:
+
+keystone user-action --parameters
 
 - A user:
-    keystone tenant-list
-    keystone user create --name "vbrownbag" --tenant [tenant_id] --pass "vbrownbag" --enabled true
+```
+keystone user-create --name "vbrownbag" --tenant [tenant_id] --pass "vbrownbag" --enabled true
+```
+
 - Lots of users
-    for i in `curl -L http://raw.github.com/Couch_to_OpenStack/`; do openstack user create
-
-
----
-
+```
+wget https://raw.githubusercontent.com/bunchc/Couch_to_OpenStack/icehouse/users.csv
+INPUT=./users.csv
+OLDIFS=$IFS
+IFS=,
+while read username tenant
+do
+  keystone user-create --name $username --tenant $tenant --pass "vbrownbag" --enabled true
+done < $INPUT
+IFS=$OLDIFS
+```
+- List users
+```
+keystone user-list
+````
+- Delete
+```
+keystone user-delete --name $username
+```
 
 ---
 # Summary
